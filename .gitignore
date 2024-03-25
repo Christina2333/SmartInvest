@@ -1,2 +1,4 @@
 .DS_Store
 .idea
+my/__pycache__/
+my/stgy/__pycache__/
