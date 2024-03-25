@@ -55,10 +55,15 @@ N = 20
 long_threshold = 0.05
 short_threshold = -0.05
 
+# 获取index_data的全部行和index_id这一列
 df = index_data.loc[:,[index_id]]
+# 计算df[index_id]这一列的变化百分比，每个元素与前一个元素的百分比变化，第一个值为Nan
 df['ret'] = df[index_id].pct_change()
+# 计算df['ret']+1的乘积，每个位置是首元素到当前元素的累积乘积
 df['asset'] = (1+df['ret']).cumprod().fillna(1)
+# shift(N)表示把df向右平移N位，当前位置的数值/N天前的数值 =》当前位置和N天前对比的涨幅
 df['N_day_ret'] = df['asset'] / df['asset'].shift(N) - 1
+# 每天的仓位
 df['pos'] = [1 if e>long_threshold else 0 if e<short_threshold else 0.5 for e in df['N_day_ret'].shift(1)]
 df['stgy_ret'] = df['ret'] * df['pos']
 df['stgy'] = (1+df['stgy_ret']).cumprod().fillna(1)
