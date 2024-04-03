@@ -22,14 +22,14 @@ def simple_rate_stgy(fund_type, data, start_date, end_date, params):
     target_wgt = target_wgt.loc[start_date:end_date].fillna(0)
 
     # 打印全部买入卖出点
-    for i in range(len(target_wgt) - 1):
-        if i == 0 and target_wgt.iloc[i, 2] == 1:
-            print("买入日期为{}".format(target_wgt.index[0]))
-        if i == len(target_wgt) - 1 and target_wgt.iloc[i, 2] == 0:
-            print("卖出日期为{}".format(target_wgt.index[i]))
-        if target_wgt.iloc[i, 2] == 0 and target_wgt.iloc[i+1, 2] == 1:
-            print("买入日期为{}".format(target_wgt.index[i+1]))
-        if target_wgt.iloc[i, 2] == 1 and target_wgt.iloc[i+1, 2] == 0:
-            print("卖出日期为{}".format(target_wgt.index[i+1]))
+    # for i in range(len(target_wgt) - 1):
+    #     if i == 0 and target_wgt.iloc[i, 2] == 1:
+    #         print("买入日期为{}".format(target_wgt.index[0]))
+    #     if i == len(target_wgt) - 1 and target_wgt.iloc[i, 2] == 0:
+    #         print("卖出日期为{}".format(target_wgt.index[i]))
+    #     if target_wgt.iloc[i, 2] == 0 and target_wgt.iloc[i+1, 2] == 1:
+    #         print("买入日期为{}".format(target_wgt.index[i+1]))
+    #     if target_wgt.iloc[i, 2] == 1 and target_wgt.iloc[i+1, 2] == 0:
+    #         print("卖出日期为{}".format(target_wgt.index[i+1]))
 
     return target_wgt

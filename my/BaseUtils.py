@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from my.Base import WeekDay
 from my.Base import MonthInvest
+from my.Base import FundType
 
 
 def datestr2dtdate(datestr, format='%Y-%m-%d'):
@@ -105,3 +106,13 @@ def get_all_monthdays(dates, monthday: MonthInvest):
     if monthday == MonthInvest.LastTradeDay:
         monthly_max_days = df.groupby('Month').max()['Date']
         return monthly_max_days
+
+
+def get_close(fund_type: FundType):
+    if FundType.GEI == fund_type:
+        return '收盘'
+    elif FundType.NDX == fund_type:
+        return 'Adj Close'
+    elif FundType.SPY == fund_type:
+        return 'Adj Close'
+    raise Exception('未处理')

@@ -1,17 +1,23 @@
 from enum import Enum
 
 
+class Constant:
+    # 收盘表示
+    Close = 'Close'
+    # 持仓
+    Hold = 'wgt'
+    # 账户收益
+    Account = 'account'
+
+
 class FundType(Enum):
+    Test = 1
     # 纳斯达克指数
-    NDX = 1
-    # 沪深300
-    HS300 = 2
-    # 中证500
-    CSI500 = 3
+    NDX = 2
     # 创业板
-    GEI = 4
+    GEI = 3
     # 标普 500
-    SPY = 5
+    SPY = 4
 
 
 class AutoInvestPlan(Enum):

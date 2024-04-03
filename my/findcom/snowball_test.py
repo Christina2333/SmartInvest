@@ -2,7 +2,7 @@ import pysnowball as ball
 import pandas as pd
 import json
 
-ball.set_token('xq_a_token=f836b1f60bead62a266e22463bc4720ec1457839')
+ball.set_token('xq_a_token=a803f604aa4e3ac6eda2cab6cdb26a76b83f4c04')
 
 
 # df = pd.read_excel('../data/usa/标普500成分股.xlsx')
@@ -15,7 +15,8 @@ for index, row in df.iterrows():
     company_class_2 = row['全球行业分类标准子行业']
     join_in_time = row['加入日期']
     start_time = row.get('成立年份')
-    res = ball.quote_detail(stock_id)['data']['quote']
+    res = ball.quote_detail(stock_id)
+    res = res['data']['quote']
     json_str = json.dumps(res)
     if 25 > res['pe_ttm'] > 0:
         print(f"股票代号:{stock_id},公司名为:{stock_name},分类为:{company_class}/{company_class_2},加入日期:{join_in_time},公司成立年份:{start_time}")

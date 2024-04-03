@@ -25,14 +25,13 @@ def rotation_stgy(data, start_date, end_date, params):
     N = params['N']
 
     start_date0 = start_date - datetime.timedelta(N) * 2
-    dates0 = get_trading_dates(FundType.HS300, start_date0, end_date)
+    dates0 = get_trading_dates(FundType.Test, start_date0, end_date)
     data0 = data.reindex(index=dates0)
     N_day_ret = data0.shift(1) / data0.shift(N + 1) - 1  # 截止昨收的最近N个交易日涨幅
     target_wgt = pd.DataFrame(index=data0.index, columns=data0.columns)
     target_wgt['hs300'] = [1 if e > 0 else 0 if e <= 0 else np.nan for e in N_day_ret['hs300'] - N_day_ret['csi500']]
     target_wgt['csi500'] = 1 - target_wgt['hs300']
     target_wgt = target_wgt.loc[start_date:end_date].fillna(0)
-
     return target_wgt
 
 

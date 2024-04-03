@@ -1,6 +1,7 @@
 import datetime
 
 from my.Base import FundType
+from my.Base import Constant
 from my.BaseUtils import cal_period_perf_indicator
 from my.DataProcess import get_hist_data
 from my.stgy.CalendarStgy import calendar_stgy
@@ -12,7 +13,7 @@ if __name__ == '__main__':
     start_date = datetime.date(2020, 7, 31)  # 回测起始日期
     end_date = datetime.date(2021, 7, 31)  # 回测截止日期
     print("回测日期[{}]-[{}]".format(start_date, end_date))
-    fund_type = FundType.HS300
+    fund_type = FundType.Test
 
     # 读取基础数据
     data = get_hist_data(fund_type=fund_type, end_date=end_date)

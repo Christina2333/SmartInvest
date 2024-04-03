@@ -14,20 +14,24 @@ from my.BaseUtils import get_drawdown
 
 # 初始数据
 # 回测数据及范围
+# fund = FundType.GEI
+# start_date = '2011-03-26'
+# close = '收盘'
 fund = FundType.NDX
-start_date = '2014-03-20'
-end_date = '2024-03-20'
-year_interval = 10
+start_date = '2004-03-26'
+end_date = '2024-03-26'
+year_interval = 20
 close = 'Adj Close'
 
+
 # 定投策略
-invest_plan = AutoInvestPlan.MONTHLY
+invest_plan = AutoInvestPlan.WEEKLY
 weekday = WeekDay.Monday
 monthday = MonthInvest.FirstTradeDay
 auto_invest_amt = 100  # 定投金额
 
-
-df = get_hist_data(fund, index_ids=[close], start_date=start_date, end_date=end_date)
+df = get_hist_data(fund, index_ids=[close], start_date=start_date, end_date=end_date,
+                   replace={"Adj Close": "Close", "收盘": "Close"})
 
 # 计算买入的日期
 buy_days = []
@@ -54,12 +58,12 @@ for date in buy_days:
     total_investment += auto_invest_amt
 
     # 计算可以购买的份额（假设没有交易费用）
-    shares = auto_invest_amt / weekly_data[close]
+    shares = auto_invest_amt / weekly_data['Close']
     total_shares += shares
     invest_days.append(date)
-    invest_close.append(weekly_data[close])
+    invest_close.append(weekly_data['Close'])
 
-final_value = total_shares * df.iloc[-1][close]
+final_value = total_shares * df.iloc[-1]['Close']
 
 if AutoInvestPlan.WEEKLY == invest_plan:
     print(f"近{year_interval}年，Investing in {fund.name} Every {weekday.name}")
@@ -71,13 +75,14 @@ print(f"总投入: {total_investment}")
 print(f"结果值: {final_value}")
 print(f"总收益率: {final_value / total_investment:.4%}")
 print(f"年复合收益：{cal_annual_compound_return(total_investment, final_value, year_interval):.4%}")
-print(f"{fund.name}近{year_interval}年的总收益为: {df.iloc[-1][close] / df.iloc[1][close]:.4%}")
-print(f"{fund.name}近{year_interval}年的年均复合收益为: {cal_annual_compound_return(df.iloc[1][close], df.iloc[-1][close], year_interval):.4%}")
-print(f"最大回撤为{np.nanmin(get_drawdown(df[close])):.4%}")
+print(f"{fund.name}近{year_interval}年的总收益为: {df.iloc[-1]['Close'] / df.iloc[1]['Close']:.4%}")
+print(
+    f"{fund.name}近{year_interval}年的年均复合收益为: {cal_annual_compound_return(df.iloc[1]['Close'], df.iloc[-1]['Close'], year_interval):.4%}")
+print(f"最大回撤为{np.nanmin(get_drawdown(df['Close'])):.4%}")
 
 # 画图
 plt.figure()
-plt.plot(df.index, df[close], color="red", linewidth=1)
+plt.plot(df.index, df['Close'], color="red", linewidth=1)
 plt.scatter(invest_days, invest_close, color="blue", s=5)
 plt.legend()
 if AutoInvestPlan.WEEKLY == invest_plan:
@@ -88,5 +93,5 @@ elif AutoInvestPlan.DAILY == invest_plan:
     plt.title(f"Investing in {fund.name} Everyday")
 
 plt.xlabel("Day")
-plt.ylabel(close)
+plt.ylabel('Close')
 plt.show()
