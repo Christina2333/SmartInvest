@@ -1,4 +1,5 @@
 import datetime
+import re
 import pandas as pd
 import numpy as np
 from my.Base import WeekDay
@@ -116,3 +117,16 @@ def get_close(fund_type: FundType):
     elif FundType.SPY == fund_type:
         return 'Adj Close'
     raise Exception('未处理')
+
+
+def get_dividend_per_share(plan_explain: str):
+    """
+    根据分红信息计算每股分红数据
+    """
+    pattern = r'(\d+(\.\d+)?)'
+    matches = re.findall(pattern, plan_explain)
+    numbers = [float(match[0]) for match in matches]
+    if len(numbers) < 2:
+        print(f"派息信息有问题：{plan_explain}")
+        return None
+    return numbers[-1] / numbers[0]

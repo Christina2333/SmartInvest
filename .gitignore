@@ -2,3 +2,5 @@
 .idea
 my/__pycache__/
 my/stgy/__pycache__/
+my/dao/__pycache__/
+my/utils/__pycache__/

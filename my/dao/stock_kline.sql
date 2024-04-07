@@ -1,0 +1,23 @@
+CREATE TABLE `stock_kline` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `stock_id` varchar(45) NOT NULL COMMENT '股票代码',
+  `dt` int NOT NULL COMMENT '时间 yyyyMMdd 格式',
+  `stock_volume` bigint NOT NULL COMMENT '股数',
+  `open` decimal(10,4) NOT NULL COMMENT '开盘价',
+  `close` decimal(10,4) NOT NULL COMMENT '收盘价',
+  `change` decimal(10,4) NOT NULL COMMENT '当天值的变化',
+  `change_percent` decimal(10,4) NOT NULL COMMENT '当天变化的百分比，用 % 表示',
+  `high` decimal(10,4) NOT NULL COMMENT '当天最高价',
+  `low` decimal(10,4) NOT NULL COMMENT '当天最低价',
+  `turnover_rate` decimal(10,4) DEFAULT NULL COMMENT '换手率 % 表示',
+  `transaction_amt` decimal(20,0) DEFAULT NULL COMMENT '当天交易额',
+  `pe` decimal(10,4) DEFAULT NULL COMMENT '市盈率=股价/每股净利润',
+  `pb` decimal(10,4) DEFAULT NULL COMMENT '市净率=股价/每股净资产',
+  `ps` decimal(10,4) DEFAULT NULL COMMENT '市销率=总市值/主营业务收入',
+  `pcf` decimal(10,4) DEFAULT NULL COMMENT '实现率=股价/每股现金流',
+  `market_capital` decimal(20,0) DEFAULT NULL COMMENT '市值',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `stock_dt` (`stock_id`,`dt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
