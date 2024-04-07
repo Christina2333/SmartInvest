@@ -2,6 +2,8 @@ import datetime
 
 
 def get_time(time):
+    if time is None:
+        return None
     dt = datetime.datetime.fromtimestamp(time/1000)
     formatted_date_str = dt.strftime('%Y%m%d')
     return int(formatted_date_str)

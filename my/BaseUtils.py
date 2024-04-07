@@ -123,6 +123,8 @@ def get_dividend_per_share(plan_explain: str):
     """
     根据分红信息计算每股分红数据
     """
+    if '派' not in plan_explain:
+        return None
     pattern = r'(\d+(\.\d+)?)'
     matches = re.findall(pattern, plan_explain)
     numbers = [float(match[0]) for match in matches]

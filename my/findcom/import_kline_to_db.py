@@ -1,7 +1,7 @@
 import pysnowball as ball
 from my.utils.KLineUtils import get_time
 from my.dao.kline_dao import KLine
-from my.dao.kline_dao import insert
+from my.utils.DbUtils import insert
 
 token = '117c88d07cecb77a9963ff144c803750b02ec004'
 

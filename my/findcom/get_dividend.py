@@ -4,7 +4,9 @@ import pysnowball as ball
 import pandas as pd
 from my.BaseUtils import get_dividend_per_share
 from my.dao.kline_dao import get_by_stock_and_dt
+from my.dao.dividend_dao import Dividend
 from my.utils.KLineUtils import get_time
+from my.utils.DbUtils import insert
 
 token = '117c88d07cecb77a9963ff144c803750b02ec004'
 
@@ -57,28 +59,40 @@ for index, row in df.iterrows():
     #     stock_name[stock_id] = res['name']
     #     print(f"股票{res['name']}, 股票代码{stock_id}，股息为{res['dividend']}, 股息率为{res['dividend_yield']}%")
 
+
 # print(stock_list)
 
-plan_list = []
-for stock_id in stock_list:
-    res = ball.bonus(stock_id, 1, 20)
-    dividend_list = res['data']['items']
-    for dividend in dividend_list:
-        # 分红详情
-        plan_explain = dividend['plan_explain']
-        # 每股分红金额
-        dividend_per_share = get_dividend_per_share(plan_explain)
-        if dividend_per_share is None:
-            continue
-        mock_share_date = False
-        # 分红日期，如果没写，就是用最近的一天
-        if dividend['ashare_ex_dividend_date'] is not None:
-            share_date = get_time(dividend['ashare_ex_dividend_date'])
-        else:
-            share_date = 20240403
-            mock_share_date = True
-        stock_code = stock_id.replace('SH', '').replace('SZ', '')
-        kline = get_by_stock_and_dt(stock_code, share_date)
+
+def get_dividend(d, stock_id):
+    """
+    根据分红接口
+    """
+    # 决定分红的财报 【2022年报】
+    dividend_year = d['dividend_year']
+    dt = int(dividend_year[:4])
+    # 派息日 yyyyMMdd
+    equity_date = get_time(dividend['equity_date'])
+    if equity_date is None:
+        print('')
+    # 派息方案【10派 36元（实施方案）】
+    plan_explain = dividend['plan_explain']
+    stock_code = stock_id.replace('SH', '').replace('SZ', '')
+    # 每股分红金额
+    dividend_per_share = get_dividend_per_share(plan_explain)
+    if dividend_per_share is None:
+        # 分红不发钱
+        return Dividend(stock_id=stock_code, dt=dt, dividend_dt=equity_date, dividend_info=plan_explain,
+                        price=None, dividend_type=0,
+                        dividend_rate=None, dividend_per_share=None), False
+    else:
+        # 分红发钱
+        mock = False
+        if equity_date is None:
+            equity_date = 20240403
+            mock = True
+            plan_explain += '(未确定具体日期)'
+        # 派息日股价
+        kline = get_by_stock_and_dt(stock_code, equity_date)
         if kline is not None and dividend_per_share is not None:
             # 分红当天股价
             price = float(kline.close)
@@ -87,11 +101,27 @@ for stock_id in stock_list:
         else:
             price = None
             dividend_rate = None
-        if mock_share_date:
-            share_date = f"{share_date}(未公布具体时间)"
-        plan = [stock_id, stock_name[stock_id], dividend['dividend_year'], share_date, plan_explain, dividend_per_share,
-                price, dividend_rate]
+        return Dividend(stock_id=stock_code, dt=dt, dividend_dt=equity_date, dividend_info=plan_explain,
+                        price=price, dividend_type=1,
+                        dividend_rate=dividend_rate, dividend_per_share=dividend_per_share), mock
+
+
+plan_list = []
+stock_dividends = []
+for stock_id in stock_list:
+    res = ball.bonus(stock_id, 1, 20)
+    dividend_list = res['data']['items']
+    for dividend in dividend_list:
+        d, mock = get_dividend(dividend, stock_id)
+        stock_dividends.append(d)
+        dividend_year = dividend['dividend_year']
+        if mock:
+            dividend_year += '(未公布具体日期)'
+        plan = [stock_id, stock_name[stock_id], dividend_year, d.dividend_dt, d.dividend_info,
+                d.dividend_per_share,
+                d.price, d.dividend_rate]
         plan_list.append(plan)
+insert(stock_dividends)
 
 df = pd.DataFrame(plan_list,
                   columns=['股票代码', '公司名称', '分红财报', '分红日期', '分红信息', '每股分红', '分红股价',

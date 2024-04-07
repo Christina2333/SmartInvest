@@ -1,11 +1,9 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DECIMAL
 from sqlalchemy import and_
-from my.utils.DbUtils import connect_to_db
+from my.utils.DbUtils import session
 
 Base = declarative_base()
-db = 'stock'
-session = connect_to_db(db)
 
 
 class KLine(Base):
@@ -29,9 +27,8 @@ class KLine(Base):
     pcf = Column(DECIMAL, unique=False, nullable=False)
     market_capital = Column(DECIMAL, unique=False, nullable=False)
 
-    def __init__(self, id, stock_id, dt, stock_volume, open, close, change, change_percent, high, low,
+    def __init__(self, stock_id, dt, stock_volume, open, close, change, change_percent, high, low,
                  turnover_rate, transaction_amt, pe, pb, ps, pcf, market_capital):
-        self.id = id
         self.stock_id = stock_id
         self.dt = dt
         self.stock_volume = stock_volume
@@ -51,12 +48,6 @@ class KLine(Base):
 
     def __str__(self):
         return 'stock_id=' + self.stock_id
-
-
-def insert(klines: list):
-    for kline in klines:
-        session.add(kline)
-    session.commit()
 
 
 def get_by_stock_and_dt(stock_id, dt):
