@@ -70,7 +70,7 @@ def get_drawdown(p):
     return dd
 
 
-def cal_annual_compound_return(start_amt: float, end_amt: float, years: int):
+def cal_annual_compound_return(start_amt: float, end_amt: float, years):
     """
     计算年均复合收益
     """

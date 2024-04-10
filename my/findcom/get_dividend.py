@@ -3,7 +3,7 @@ from enum import Enum
 import pysnowball as ball
 import pandas as pd
 from my.BaseUtils import get_dividend_per_share
-from my.dao.kline_dao import get_by_stock_and_dt
+from my.dao.kline_dao import get_year_avg
 from my.dao.dividend_dao import Dividend
 from my.utils.KLineUtils import get_time
 from my.utils.DbUtils import insert
@@ -69,7 +69,7 @@ def get_dividend(d, stock_id):
     """
     # 决定分红的财报 【2022年报】
     dividend_year = d['dividend_year']
-    dt = int(dividend_year[:4])
+    year = int(dividend_year[:4])
     # 派息日 yyyyMMdd
     equity_date = get_time(dividend['equity_date'])
     if equity_date is None:
@@ -81,7 +81,7 @@ def get_dividend(d, stock_id):
     dividend_per_share = get_dividend_per_share(plan_explain)
     if dividend_per_share is None:
         # 分红不发钱
-        return Dividend(stock_id=stock_code, dt=dt, dividend_dt=equity_date, dividend_info=plan_explain,
+        return Dividend(stock_id=stock_code, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
                         price=None, dividend_type=0,
                         dividend_rate=None, dividend_per_share=None), False
     else:
@@ -92,16 +92,16 @@ def get_dividend(d, stock_id):
             mock = True
             plan_explain += '(未确定具体日期)'
         # 派息日股价
-        kline = get_by_stock_and_dt(stock_code, equity_date)
-        if kline is not None and dividend_per_share is not None:
+        close = get_year_avg(stock_code, year)
+        if close is not None and dividend_per_share is not None:
             # 分红当天股价
-            price = float(kline.close)
+            price = float(close)
             # 股息率
             dividend_rate = dividend_per_share / price
         else:
             price = None
             dividend_rate = None
-        return Dividend(stock_id=stock_code, dt=dt, dividend_dt=equity_date, dividend_info=plan_explain,
+        return Dividend(stock_id=stock_code, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
                         price=price, dividend_type=1,
                         dividend_rate=dividend_rate, dividend_per_share=dividend_per_share), mock
 
@@ -117,10 +117,11 @@ for stock_id in stock_list:
         dividend_year = dividend['dividend_year']
         if mock:
             dividend_year += '(未公布具体日期)'
-        plan = [stock_id, stock_name[stock_id], dividend_year, d.dividend_dt, d.dividend_info,
-                d.dividend_per_share,
-                d.price, d.dividend_rate]
-        plan_list.append(plan)
+        if d.year >= 2013:
+            plan = [stock_id, stock_name[stock_id], dividend_year, d.dividend_dt, d.dividend_info,
+                    d.dividend_per_share,
+                    d.price, d.dividend_rate]
+            plan_list.append(plan)
 insert(stock_dividends)
 
 df = pd.DataFrame(plan_list,

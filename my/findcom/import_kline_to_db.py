@@ -5,7 +5,9 @@ from my.utils.DbUtils import insert
 
 token = '117c88d07cecb77a9963ff144c803750b02ec004'
 
-stock_list = ['SH688303', 'SH601988', 'SH601939', 'SH601919', 'SH601916', 'SH601838', 'SH601818', 'SH601699', 'SH601658', 'SH601398', 'SH601377', 'SH601328', 'SH601318', 'SH601288', 'SH601229', 'SH601225', 'SH601169', 'SH601166', 'SH601088', 'SH601009', 'SH601006', 'SH600919', 'SH600741', 'SH600585', 'SH600438', 'SH600188', 'SH600089', 'SH600048', 'SH600039', 'SH600036', 'SH600028', 'SH600016', 'SH600015', 'SZ002555', 'SZ002466', 'SZ002027', 'SZ000983', 'SZ000895', 'SZ000425', 'SZ000408', 'SZ000002']
+# stock_list = ['SH688303', 'SH601988', 'SH601939', 'SH601919', 'SH601916', 'SH601838', 'SH601818', 'SH601699', 'SH601658', 'SH601398', 'SH601377', 'SH601328', 'SH601318', 'SH601288', 'SH601229', 'SH601225', 'SH601169', 'SH601166', 'SH601088', 'SH601009', 'SH601006', 'SH600919', 'SH600741', 'SH600585', 'SH600438', 'SH600188', 'SH600089', 'SH600048', 'SH600039', 'SH600036', 'SH600028', 'SH600016', 'SH600015', 'SZ002555', 'SZ002466', 'SZ002027', 'SZ000983', 'SZ000895', 'SZ000425', 'SZ000408', 'SZ000002']
+# 牧原股份，双汇发展
+stock_list = ['SZ002714', 'SZ000895']
 ball.set_token(f'xq_a_token={token}')
 
 for stock in stock_list:
@@ -30,7 +32,7 @@ for stock in stock_list:
         pcf = item[15]
         market_capital = item[16]
         stock_id = stock.replace('SH', '').replace('SZ', '')
-        kline = KLine(id=None, stock_id=stock_id, dt=dt, stock_volume=volume, open=open, high=high, low=low, close=close,
+        kline = KLine(stock_id=stock_id, dt=dt, stock_volume=volume, open=open, high=high, low=low, close=close,
                       change=change,
                       change_percent=change_percent, turnover_rate=turnover_rate, transaction_amt=amt, pe=pe, pb=pb,
                       ps=ps, pcf=pcf,

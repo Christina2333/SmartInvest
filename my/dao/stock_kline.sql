@@ -1,7 +1,9 @@
 CREATE TABLE `stock_kline` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `stock_id` varchar(45) NOT NULL COMMENT '股票代码',
-  `dt` int NOT NULL COMMENT '时间 yyyyMMdd 格式',
+  `dt` INT NOT NULL COMMENT '时间 yyyyMMdd 格式',
+  `month` INT NOT NULL COMMENT '时间 yyyyMM 格式的月份',
+  `year` INT NOT NULL COMMENT '时间 yyyy 格式的年份',
   `stock_volume` bigint NOT NULL COMMENT '股数',
   `open` decimal(10,4) NOT NULL COMMENT '开盘价',
   `close` decimal(10,4) NOT NULL COMMENT '收盘价',

@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DECIMAL
+from sqlalchemy import Column, Integer, String, DECIMAL, text
 from sqlalchemy import and_
 from my.utils.DbUtils import session
 
@@ -12,6 +12,8 @@ class KLine(Base):
     id = Column(Integer, primary_key=True)
     stock_id = Column(String(45), unique=False, nullable=False)
     dt = Column(Integer, unique=False, nullable=False)
+    month = Column(Integer, unique=False, nullable=False)
+    year = Column(Integer, unique=False, nullable=False)
     stock_volume = Column(Integer, unique=False, nullable=False)
     open = Column(DECIMAL, unique=False, nullable=False)
     close = Column(DECIMAL, unique=False, nullable=False)
@@ -31,6 +33,8 @@ class KLine(Base):
                  turnover_rate, transaction_amt, pe, pb, ps, pcf, market_capital):
         self.stock_id = stock_id
         self.dt = dt
+        self.month = round(dt / 100)
+        self.year = round(dt / 10000)
         self.stock_volume = stock_volume
         self.open = open
         self.close = close
@@ -51,6 +55,9 @@ class KLine(Base):
 
 
 def get_by_stock_and_dt(stock_id, dt):
+    """
+    获取股票当天的价格
+    """
     query = session.query(KLine).filter(and_(KLine.stock_id == stock_id, KLine.dt == dt))
     if query.is_single_entity:
         return query.first()
@@ -58,13 +65,56 @@ def get_by_stock_and_dt(stock_id, dt):
         return None
 
 
-# if __name__ == '__main__':
-#     kline1 = KLine(id=None, stock_id='test', dt=20240403, stock_volume=1, open=1, close=1, change_percent=1, change=1,
-#                    high=1, low=1,
-#                    turnover_rate=1, transaction_amt=1, pe=1, pb=1, ps=1, pcf=1, market_capital=1)
-#     kline2 = KLine(id=None, stock_id='test1', dt=20240403, stock_volume=1, open=1, close=1, change_percent=1, change=1,
-#                    high=1, low=1,
-#                    turnover_rate=1, transaction_amt=1, pe=1, pb=1, ps=1, pcf=1, market_capital=1)
-#     # insert([kline1, kline2])
-#     res = get_by_stock_and_dt('test', 20240403)
-#     print(res)
+def get_by_stock_and_month(stock_id, month):
+    """
+    获取股票某个月底的价格
+    """
+    sql = text(f"select * from `stock_kline` where `stock_id` = '{stock_id}' and `month` = {month} "
+               f"order by `dt` desc limit 1")
+    query = session.execute(sql)
+    if query is not None:
+        return query.first()
+    else:
+        return None
+
+
+def get_by_stock_and_months(stock_id, months):
+    result = []
+    for month in months:
+        res = get_by_stock_and_month(stock_id, month)
+        result.append(res.close)
+    return result
+
+
+def get_by_stock_and_year(stock_id, year):
+    """
+    获取股票某个年底的价格
+    """
+    sql = text(f"select * from `stock_kline` where `stock_id` = '{stock_id}' and `year` = {year} "
+               f"order by `dt` desc limit 1")
+    query = session.execute(sql)
+    if query is not None:
+        return query.first()
+    else:
+        return None
+
+
+def get_year_avg(stock_id, year):
+    """
+    获取股票某年的均价
+    """
+    sql = text(f"select avg(`close`) from `stock_kline` where `stock_id` = '{stock_id}' and year = {year}")
+    query = session.execute(sql)
+    if query is not None:
+        return query.first()[0]
+    else:
+        return None
+
+
+if __name__ == '__main__':
+    res = get_by_stock_and_month('000895', 202403)
+    avg1 = get_year_avg('000895', 2024)
+    avg2 = get_year_avg('000895', 2023)
+    print(avg1)
+
+
