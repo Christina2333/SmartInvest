@@ -1,7 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DECIMAL
-from sqlalchemy import and_
-from my.utils.DbUtils import connect_to_db
 
 Base = declarative_base()
 

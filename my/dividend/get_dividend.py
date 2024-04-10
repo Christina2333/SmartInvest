@@ -3,10 +3,13 @@ from enum import Enum
 import pysnowball as ball
 import pandas as pd
 from my.BaseUtils import get_dividend_per_share
+from my.BaseUtils import cal_annual_compound_return
 from my.dao.kline_dao import get_year_avg
+from my.dao.kline_dao import get_by_stock_and_dt
 from my.dao.dividend_dao import Dividend
 from my.utils.KLineUtils import get_time
 from my.utils.DbUtils import insert
+from datetime import datetime
 
 token = '117c88d07cecb77a9963ff144c803750b02ec004'
 
@@ -106,6 +109,20 @@ def get_dividend(d, stock_id):
                         dividend_rate=dividend_rate, dividend_per_share=dividend_per_share), mock
 
 
+def get_annual_return(stock_id, begin_dt, end_dt):
+    """
+    计算年化收益率
+    """
+    begin = get_by_stock_and_dt(stock_id, begin_dt)
+    end = get_by_stock_and_dt(stock_id, end_dt)
+    if begin is None or end is None:
+        return None
+    date1 = datetime.strptime(str(begin_dt), '%Y%m%d')
+    date2 = datetime.strptime(str(end_dt), '%Y%m%d')
+    delta = (date2 - date1).days / 365
+    return cal_annual_compound_return(float(begin.close), float(end.close), delta)
+
+
 plan_list = []
 stock_dividends = []
 for stock_id in stock_list:
@@ -117,16 +134,19 @@ for stock_id in stock_list:
         dividend_year = dividend['dividend_year']
         if mock:
             dividend_year += '(未公布具体日期)'
+        stock_code = stock_id.replace('SH', '').replace('SZ', '')
+        five_year_return = get_annual_return(stock_code, 20190403, 20240403)
+        ten_year_return = get_annual_return(stock_code, 20140403, 20240403)
         if d.year >= 2013:
             plan = [stock_id, stock_name[stock_id], dividend_year, d.dividend_dt, d.dividend_info,
                     d.dividend_per_share,
-                    d.price, d.dividend_rate]
+                    d.price, d.dividend_rate, five_year_return, ten_year_return]
             plan_list.append(plan)
-insert(stock_dividends)
+# insert(stock_dividends)
 
 df = pd.DataFrame(plan_list,
                   columns=['股票代码', '公司名称', '分红财报', '分红日期', '分红信息', '每股分红', '分红股价',
-                           '股息率'])
+                           '股息率', '近5年年化收益', '近10年年化收益'])
 
 df['平均股息率'] = df.groupby('股票代码')['股息率'].transform('mean')
 df.to_excel('out.xlsx', index=False)
