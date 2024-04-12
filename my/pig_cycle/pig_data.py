@@ -6,6 +6,7 @@ from my.dao.kline_dao import get_by_stock_and_months
 df = pd.read_excel('../data/pig_cycle/猪肉价格.xls', header=None, index_col=0)
 df = df.T.dropna()
 df = df.reindex(index=df.index[::-1])
+normalize = True
 
 
 def date_to_int(date):
@@ -35,14 +36,20 @@ def normalize_min_max(data):
         return normalized_data
 
 
+if normalize:
+    df_pig_price = normalize_min_max(df['猪肉（去骨统肉）集贸市场价格当期值(元/公斤)'])
+    df_muyuan = normalize_min_max(SZ_002714)
+    df_shuanghui = normalize_min_max(SZ_000895)
+else:
+    df_pig_price = df['猪肉（去骨统肉）集贸市场价格当期值(元/公斤)']
+    df_muyuan = SZ_002714
+    df_shuanghui = SZ_000895
+
 plt.figure()
 plt.tick_params(axis='x', labelsize=3)
-# plt.plot(df['日期'], normalize_min_max(df['猪肉（去骨统肉）集贸市场价格当期值(元/公斤)']), label='pig price', color='red')
-plt.plot(df['日期'], df['猪肉（去骨统肉）集贸市场价格当期值(元/公斤)'], label='pig price', color='red')
-# plt.plot(df['日期'], normalize_min_max(SZ_002714), label='muyuan', color='green')
-plt.plot(df['日期'], SZ_002714, label='muyuan', color='green')
-# plt.plot(df['日期'], normalize_min_max(SZ_000895), label='shuanghui', color='blue')
-plt.plot(df['日期'], SZ_000895, label='shuanghui', color='blue')
+plt.plot(df['日期'], df_pig_price, label='pig price', color='red')
+plt.plot(df['日期'], df_muyuan, label='muyuan', color='green')
+plt.plot(df['日期'], df_shuanghui, label='shuanghui', color='blue')
 plt.legend()
 plt.title(f"pig price")
 plt.xlabel("Month")
