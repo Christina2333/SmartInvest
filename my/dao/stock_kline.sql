@@ -1,6 +1,7 @@
 CREATE TABLE `stock_kline` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `stock_id` varchar(45) NOT NULL COMMENT '股票代码',
+  `stock_code` varchar(45) NOT NULL COMMENT '股票代码，带 SH 或者 SZ 前缀',
   `dt` INT NOT NULL COMMENT '时间 yyyyMMdd 格式',
   `month` INT NOT NULL COMMENT '时间 yyyyMM 格式的月份',
   `year` INT NOT NULL COMMENT '时间 yyyy 格式的年份',
@@ -21,5 +22,5 @@ CREATE TABLE `stock_kline` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  KEY `stock_dt` (`stock_id`,`dt`)
+  UNIQUE KEY uk_stock_dt (`stock_code`, `dt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3

@@ -11,6 +11,7 @@ class KLine(Base):
 
     id = Column(Integer, primary_key=True)
     stock_id = Column(String(45), unique=False, nullable=False)
+    stock_code = Column(String(45), unique=False, nullable=False)
     dt = Column(Integer, unique=False, nullable=False)
     month = Column(Integer, unique=False, nullable=False)
     year = Column(Integer, unique=False, nullable=False)
@@ -29,8 +30,10 @@ class KLine(Base):
     pcf = Column(DECIMAL, unique=False, nullable=False)
     market_capital = Column(DECIMAL, unique=False, nullable=False)
 
-    def __init__(self, stock_id, dt, stock_volume, open, close, change, change_percent, high, low,
+    def __init__(self, stock_code, dt, stock_volume, open, close, change, change_percent, high, low,
                  turnover_rate, transaction_amt, pe, pb, ps, pcf, market_capital):
+        self.stock_code = stock_code
+        stock_id = stock_code.replace('SH', '').replace('SZ', '')
         self.stock_id = stock_id
         self.dt = dt
         self.month = round(dt / 100)
@@ -53,7 +56,6 @@ class KLine(Base):
     def __str__(self):
         return 'stock_id=' + self.stock_id
 
-
 def get_by_stock_and_dt(stock_id, dt):
     """
     获取股票当天的价格
@@ -63,6 +65,12 @@ def get_by_stock_and_dt(stock_id, dt):
         return query.first()
     else:
         return None
+
+
+def get_by_stock_and_dt_section(stock_code, start_dt, end_dt):
+    sql = text(f"select * from stock_kline where stock_code = '{stock_code}' and dt between {start_dt} and {end_dt}")
+    query = session.execute(sql)
+    return query.fetchall()
 
 
 def get_by_stock_and_month(stock_id, month):
@@ -112,9 +120,10 @@ def get_year_avg(stock_id, year):
 
 
 if __name__ == '__main__':
-    res = get_by_stock_and_month('000895', 202403)
-    avg1 = get_year_avg('000895', 2024)
-    avg2 = get_year_avg('000895', 2023)
-    print(avg1)
+    # res = get_by_stock_and_month('000895', 202403)
+    # avg1 = get_year_avg('000895', 2024)
+    # avg2 = get_year_avg('000895', 2023)
+    res = get_by_stock_and_dt_section('SH600036', 20140411, 20240411)
+    print(res)
 
 
