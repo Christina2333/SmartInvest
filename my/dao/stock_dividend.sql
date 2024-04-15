@@ -1,6 +1,7 @@
 CREATE TABLE `stock_dividend` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `stock_id` varchar(45) NOT NULL COMMENT '股票代码',
+  `stock_code` varchar(45) NOT NULL COMMENT '股票代码',
   `year` int NOT NULL COMMENT '分红年份 yyyy 格式',
   `dividend_dt` int DEFAULT NULL COMMENT '分红具体日期 yyyyMMdd 格式',
   `dividend_info` varchar(1024) NOT NULL COMMENT '分红具体信息',
@@ -11,5 +12,5 @@ CREATE TABLE `stock_dividend` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  KEY `stock_dt` (`stock_id`,`year`)
+  KEY `stock_dt` (`stock_code`,`year`)
 ) ENGINE=InnoDB

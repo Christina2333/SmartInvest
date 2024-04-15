@@ -18,8 +18,8 @@ def date_to_int(date):
 
 df['日期'] = df['指标'].apply(date_to_int)
 
-SZ_002714 = get_by_stock_and_months('002714', df['日期'])
-SZ_000895 = get_by_stock_and_months('000895', df['日期'])
+SZ_002714 = get_by_stock_and_months('SZ002714', df['日期'])
+SZ_000895 = get_by_stock_and_months('SZ000895', df['日期'])
 
 
 def normalize_min_max(data):

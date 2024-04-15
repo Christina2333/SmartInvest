@@ -79,12 +79,11 @@ def get_dividend(d, stock_id):
         print('')
     # 派息方案【10派 36元（实施方案）】
     plan_explain = dividend['plan_explain']
-    stock_code = stock_id.replace('SH', '').replace('SZ', '')
     # 每股分红金额
     dividend_per_share = get_dividend_per_share(plan_explain)
     if dividend_per_share is None:
         # 分红不发钱
-        return Dividend(stock_id=stock_code, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
+        return Dividend(stock_code=stock_id, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
                         price=None, dividend_type=0,
                         dividend_rate=None, dividend_per_share=None), False
     else:
@@ -95,7 +94,7 @@ def get_dividend(d, stock_id):
             mock = True
             plan_explain += '(未确定具体日期)'
         # 派息日股价
-        close = get_year_avg(stock_code, year)
+        close = get_year_avg(stock_id, year)
         if close is not None and dividend_per_share is not None:
             # 分红当天股价
             price = float(close)
@@ -104,17 +103,17 @@ def get_dividend(d, stock_id):
         else:
             price = None
             dividend_rate = None
-        return Dividend(stock_id=stock_code, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
+        return Dividend(stock_code=stock_id, year=year, dividend_dt=equity_date, dividend_info=plan_explain,
                         price=price, dividend_type=1,
                         dividend_rate=dividend_rate, dividend_per_share=dividend_per_share), mock
 
 
-def get_annual_return(stock_id, begin_dt, end_dt):
+def get_annual_return(stock_code, begin_dt, end_dt):
     """
     计算年化收益率
     """
-    begin = get_by_stock_and_dt(stock_id, begin_dt)
-    end = get_by_stock_and_dt(stock_id, end_dt)
+    begin = get_by_stock_and_dt(stock_code, begin_dt)
+    end = get_by_stock_and_dt(stock_code, end_dt)
     if begin is None or end is None:
         return None
     date1 = datetime.strptime(str(begin_dt), '%Y%m%d')
@@ -134,9 +133,8 @@ for stock_id in stock_list:
         dividend_year = dividend['dividend_year']
         if mock:
             dividend_year += '(未公布具体日期)'
-        stock_code = stock_id.replace('SH', '').replace('SZ', '')
-        five_year_return = get_annual_return(stock_code, 20190403, 20240403)
-        ten_year_return = get_annual_return(stock_code, 20140403, 20240403)
+        five_year_return = get_annual_return(stock_id, 20190403, 20240403)
+        ten_year_return = get_annual_return(stock_id, 20140403, 20240403)
         if d.year >= 2013:
             plan = [stock_id, stock_name[stock_id], dividend_year, d.dividend_dt, d.dividend_info,
                     d.dividend_per_share,

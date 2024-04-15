@@ -56,12 +56,14 @@ class KLine(Base):
     def __str__(self):
         return 'stock_id=' + self.stock_id
 
-def get_by_stock_and_dt(stock_id, dt):
+
+def get_by_stock_and_dt(stock_code, dt):
     """
     获取股票当天的价格
     """
-    query = session.query(KLine).filter(and_(KLine.stock_id == stock_id, KLine.dt == dt))
-    if query.is_single_entity:
+    sql = text(f"select * from stock_kline where stock_code = '{stock_code}' and dt = {dt}")
+    query = session.execute(sql)
+    if query is not None:
         return query.first()
     else:
         return None
@@ -73,11 +75,11 @@ def get_by_stock_and_dt_section(stock_code, start_dt, end_dt):
     return query.fetchall()
 
 
-def get_by_stock_and_month(stock_id, month):
+def get_by_stock_and_month(stock_code, month):
     """
     获取股票某个月底的价格
     """
-    sql = text(f"select * from `stock_kline` where `stock_id` = '{stock_id}' and `month` = {month} "
+    sql = text(f"select * from `stock_kline` where `stock_code` = '{stock_code}' and `month` = {month} "
                f"order by `dt` desc limit 1")
     query = session.execute(sql)
     if query is not None:
@@ -86,19 +88,19 @@ def get_by_stock_and_month(stock_id, month):
         return None
 
 
-def get_by_stock_and_months(stock_id, months):
+def get_by_stock_and_months(stock_code, months):
     result = []
     for month in months:
-        res = get_by_stock_and_month(stock_id, month)
+        res = get_by_stock_and_month(stock_code, month)
         result.append(res.close)
     return result
 
 
-def get_by_stock_and_year(stock_id, year):
+def get_by_stock_and_year(stock_code, year):
     """
     获取股票某个年底的价格
     """
-    sql = text(f"select * from `stock_kline` where `stock_id` = '{stock_id}' and `year` = {year} "
+    sql = text(f"select * from `stock_kline` where `stock_code` = '{stock_code}' and `year` = {year} "
                f"order by `dt` desc limit 1")
     query = session.execute(sql)
     if query is not None:
@@ -107,14 +109,26 @@ def get_by_stock_and_year(stock_id, year):
         return None
 
 
-def get_year_avg(stock_id, year):
+def get_year_avg(stock_code, year):
     """
     获取股票某年的均价
     """
-    sql = text(f"select avg(`close`) from `stock_kline` where `stock_id` = '{stock_id}' and year = {year}")
+    sql = text(f"select avg(`close`) from `stock_kline` where `stock_code` = '{stock_code}' and year = {year}")
     query = session.execute(sql)
     if query is not None:
         return query.first()[0]
+    else:
+        return None
+
+
+def get_stock_all(stock_code):
+    """
+    获取某个股票全部数据
+    """
+    sql = text(f"select * from `stock_kline` where `stock_code` = '{stock_code}' order by dt asc")
+    query = session.execute(sql)
+    if query is not None:
+        return query.fetchall()
     else:
         return None
 
@@ -123,7 +137,6 @@ if __name__ == '__main__':
     # res = get_by_stock_and_month('000895', 202403)
     # avg1 = get_year_avg('000895', 2024)
     # avg2 = get_year_avg('000895', 2023)
-    res = get_by_stock_and_dt_section('SH600036', 20140411, 20240411)
+    # res = get_by_stock_and_dt_section('SH600036', 20140411, 20240411)
+    res = get_stock_all('SH600900')
     print(res)
-
-

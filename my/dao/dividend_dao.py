@@ -9,6 +9,7 @@ class Dividend(Base):
 
     id = Column(Integer, primary_key=True)
     stock_id = Column(String(45), unique=False, nullable=False)
+    stock_code = Column(String(45), unique=False, nullable=False)
     year = Column(Integer, unique=False, nullable=False)
     dividend_dt = Column(Integer, unique=False, nullable=False)
     dividend_info = Column(String(1024), unique=False, nullable=False)
@@ -17,7 +18,9 @@ class Dividend(Base):
     price = Column(DECIMAL, unique=False, nullable=False)
     dividend_rate = Column(DECIMAL, unique=False, nullable=False)
 
-    def __init__(self, stock_id, year, dividend_dt, dividend_info, dividend_type, dividend_per_share, price, dividend_rate):
+    def __init__(self, stock_code, year, dividend_dt, dividend_info, dividend_type, dividend_per_share, price, dividend_rate):
+        self.stock_code = stock_code
+        stock_id = stock_code.replace('SH', '').replace('SZ', '')
         self.stock_id = stock_id
         self.year = year
         self.dividend_dt = dividend_dt
