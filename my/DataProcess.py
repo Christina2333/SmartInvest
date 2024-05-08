@@ -1,5 +1,7 @@
 import pandas as pd
+import numpy as np
 
+from datetime import datetime
 from my.Base import FundType
 from my.BaseUtils import datestr2dtdate
 
@@ -36,6 +38,38 @@ def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date
     if start_date is not None:
         data = data.loc[start_date:, :]
     if end_date is not None:
+        data = data.loc[:end_date, :]
+    # 字段名称替换
+    if replace is not None:
+        for old_key, new_key in replace.items():
+            if old_key in data.columns:
+                data = data.rename(columns={old_key: new_key})
+    return data
+
+
+def get_hist_data_from_ywcq(file_name, index_ids=None, start_date=None, end_date=None, replace: dict = None):
+    """
+    从英为财情网站获取数据
+    @param file_name 文件路径
+    @param index_ids 需要的字段，不含日期字段
+    @param start_date 开始时间字符串yyyy-MM-dd格式
+    @param end_date 结束时间字符串yyyy-MM-dd格式
+    @param replace  替换的字段
+    """
+    data = pd.read_csv(file_name)
+    if not data['收盘'].dtype.name == 'float64':
+        data['收盘'] = data['收盘'].str.replace(',', '')
+    data['收盘'] = pd.to_numeric(data['收盘'])
+    data = data.set_index('日期')
+    data = data.iloc[::-1]
+    data.index = [datestr2dtdate(e) for e in data.index]
+    if index_ids is not None:
+        data = data.loc[:, index_ids]
+    if start_date is not None:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        data = data.loc[start_date:, :]
+    if end_date is not None:
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
         data = data.loc[:end_date, :]
     # 字段名称替换
     if replace is not None:
