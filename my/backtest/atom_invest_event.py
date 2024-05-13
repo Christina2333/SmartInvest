@@ -9,17 +9,19 @@ from my.DataProcess import get_hist_data
 from my.BaseUtils import cal_annual_compound_return
 from my.BaseUtils import get_all_monthdays
 from my.BaseUtils import get_drawdown
+from datetime import datetime
 
 # 2000年互联网泡沫
-# start_date = '2000-03-10'
+start_date = '2000-03-10'
 # 2007次贷危机
 # start_date = '2007-10-31'
 # 2020年疫情
 # start_date = '2020-02-01'
 # 2021底
-start_date = '2022-01-01'
-end_date = '2024-01-01'
-year_interval = 2
+# start_date = '2022-01-01'
+end_date = '2024-05-10'
+# 时间差
+year_interval = (datetime.strptime(end_date, '%Y-%m-%d') - datetime.strptime(start_date, '%Y-%m-%d')).days / 365.0
 close = 'Adj Close'
 
 # 定投策略
@@ -60,11 +62,13 @@ def get_margin(df, buy_dates):
         margin.append((current - total_investment) / total_investment)
         invest_days.append(date)
         invest_close.append(weekly_data['Close'])
-    return invest_days, margin, total_shares, total_investment
+    return invest_days, margin, total_shares, total_investment, invest_close
 
 
-invest_days_ndx, ndx_margin, total_shares_ndx, total_investment_ndx = get_margin(df_ndx, buy_days)
-invest_days_spy, spy_margin, total_shares_spy, total_investment_spy = get_margin(df_spy, buy_days)
+invest_days_ndx, ndx_margin, total_shares_ndx, total_investment_ndx, ndx_close = get_margin(df_ndx, buy_days)
+invest_days_spy, spy_margin, total_shares_spy, total_investment_spy, spy_close = get_margin(df_spy, buy_days)
+ndx_close = (ndx_close / ndx_close[1]) - 1
+spy_close = (spy_close / spy_close[1]) - 1
 
 final_value_ndx = total_shares_ndx * df_ndx.iloc[-1]['Close']
 final_value_spy = total_shares_spy * df_spy.iloc[-1]['Close']
@@ -84,9 +88,11 @@ print(f"SPY 定投 年复合收益：{cal_annual_compound_return(total_investmen
 print(f"SPY 最大回撤为{np.nanmin(get_drawdown(df_spy['Close'])):.4%}")
 
 # 画图
-plt.figure(1)
-plt.plot(invest_days_ndx, ndx_margin, color="red", linewidth=1, label='NDX')
-plt.plot(invest_days_ndx, spy_margin, color="blue", linewidth=1, label='SPY')
+plt.figure(2)
+plt.plot(invest_days_ndx, ndx_margin, color="red", linewidth=1, label='NDX_AUTO_INVEST')
+plt.plot(invest_days_ndx, ndx_close, color="red", linestyle='--', linewidth=1, label='NDX')
+plt.plot(invest_days_ndx, spy_margin, color="blue", linewidth=1, label='SPY_AUTO_INVEST')
+plt.plot(invest_days_ndx, spy_close, color="blue", linestyle='--', linewidth=1, label='SPY')
 plt.plot(invest_days_ndx, pd.Series(np.zeros(len(invest_days_ndx))), color="green", linewidth=1, label='zero')
 plt.legend()
 plt.title(f"Investing in SPY/NDX Every {monthday.name} in a month")

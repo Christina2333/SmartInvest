@@ -14,17 +14,17 @@ def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date
     end_date：结束时间，str 类型
     """
     if fund_type == FundType.NDX:
-        data = pd.read_csv('data/usa/^NDX.csv').set_index('Date')
+        data = pd.read_csv('../data/usa/^NDX.csv').set_index('Date')
     elif fund_type == FundType.Test:
-        data = pd.read_csv('data/a/basic_data.csv').set_index('datetime')
+        data = pd.read_csv('../data/a/basic_data.csv').set_index('datetime')
     elif fund_type == FundType.GEI:
-        data = pd.read_csv('data/a/创业板指数（价格）历史数据.csv')
+        data = pd.read_csv('../data/a/创业板指数（价格）历史数据.csv')
         data['收盘'] = data['收盘'].str.replace(',', '')
         data['收盘'] = pd.to_numeric(data['收盘'])
         data = data.set_index('日期')
         data = data.iloc[::-1]
     elif fund_type == FundType.SPY:
-        data = pd.read_csv('data/usa/SPY.csv').set_index('Date')
+        data = pd.read_csv('../data/usa/SPY.csv').set_index('Date')
     else:
         raise RuntimeError('不存在的fund类型')
     data.index = [datestr2dtdate(e) for e in data.index]
@@ -86,10 +86,10 @@ def get_trading_dates(fund_type: FundType, start_date=None, end_date=None):
         dates：交易日的datetime.date，Close 为收盘价
     """
     if fund_type == FundType.NDX:
-        dates = pd.read_csv('data/usa/^NDX.csv')['Date'].to_list()
+        dates = pd.read_csv('../data/usa/^NDX.csv')['Date'].to_list()
         dates = [datestr2dtdate(e) for e in dates]
     elif fund_type == FundType.Test:
-        dates = pd.read_csv('data/a/trading_date.csv')['trade_date'].to_list()
+        dates = pd.read_csv('../data/a/trading_date.csv')['trade_date'].to_list()
         dates = [datestr2dtdate(e, format='%Y/%m/%d') for e in dates]
     elif fund_type == FundType.GEI:
         dates = get_hist_data(fund_type, ['日期'], start_date, end_date)
