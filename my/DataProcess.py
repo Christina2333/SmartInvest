@@ -3,10 +3,11 @@ import numpy as np
 
 from datetime import datetime
 from my.Base import FundType
+from my.Base import FreqType
 from my.BaseUtils import datestr2dtdate
 
 
-def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date=None, replace: dict = None):
+def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date=None, replace: dict = None, freq: FreqType=FreqType.Day):
     """
     根据起始时间和列名获取dataset
     index_ids: []，表示需要的列
@@ -14,7 +15,12 @@ def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date
     end_date：结束时间，str 类型
     """
     if fund_type == FundType.NDX:
-        data = pd.read_csv('../data/usa/^NDX.csv').set_index('Date')
+        if freq == FreqType.Day:
+            data = pd.read_csv('../data/usa/^NDX.csv').set_index('Date')
+        elif freq == FreqType.Week:
+            data = pd.read_csv('../data/usa/^NDX_wk.csv').set_index('Date')
+        else:
+            raise RuntimeError('不支持的 freqType 类型')
     elif fund_type == FundType.Test:
         data = pd.read_csv('../data/a/basic_data.csv').set_index('datetime')
     elif fund_type == FundType.GEI:
@@ -24,7 +30,12 @@ def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date
         data = data.set_index('日期')
         data = data.iloc[::-1]
     elif fund_type == FundType.SPY:
-        data = pd.read_csv('../data/usa/SPY.csv').set_index('Date')
+        if freq == FreqType.Day:
+            data = pd.read_csv('../data/usa/SPY.csv').set_index('Date')
+        elif freq == FreqType.Week:
+            data = pd.read_csv('../data/usa/SPY_wk.csv').set_index('Date')
+        else:
+            raise RuntimeError('不支持的 freqType 类型')
     else:
         raise RuntimeError('不存在的fund类型')
     data.index = [datestr2dtdate(e) for e in data.index]

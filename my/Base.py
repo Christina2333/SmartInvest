@@ -20,6 +20,13 @@ class FundType(Enum):
     SPY = 4
 
 
+class FreqType(Enum):
+    # 每日数据
+    Day = 1
+    # 每周数据
+    Week = 2
+
+
 class AutoInvestPlan(Enum):
     DAILY = 1
     WEEKLY = 2
