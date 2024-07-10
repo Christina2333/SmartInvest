@@ -18,6 +18,8 @@ class FundType(Enum):
     GEI = 3
     # 标普 500
     SPY = 4
+    # 美国国债
+    TLT = 5
 
 
 class FreqType(Enum):

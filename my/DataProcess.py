@@ -36,6 +36,13 @@ def get_hist_data(fund_type: FundType, index_ids=None, start_date=None, end_date
             data = pd.read_csv('../data/usa/SPY_wk.csv').set_index('Date')
         else:
             raise RuntimeError('不支持的 freqType 类型')
+    elif fund_type == FundType.TLT:
+        if freq == FreqType.Week:
+            data = pd.read_csv('../data/usa/TLT_wk.csv').set_index('Date')
+        elif freq == FreqType.Day:
+            data = pd.read_csv('../data/usa/TLT.csv').set_index('Date')
+        else:
+            raise RuntimeError('不支持的 freqType 类型')
     else:
         raise RuntimeError('不存在的fund类型')
     data.index = [datestr2dtdate(e) for e in data.index]
