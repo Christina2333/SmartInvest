@@ -27,6 +27,7 @@ monthday = MonthInvest.FirstTradeDay
 auto_invest_amt = 100  # 定投金额
 
 invest_money = 300_0000
+init_invest_money = invest_money
 stock_rate = 0.7
 bond_rate = 1 - stock_rate
 
@@ -46,10 +47,12 @@ bond_df = get_hist_data(bond_fund,
 
 # 股票初始的份额
 stock_share = invest_money * stock_rate / stock_df.iloc[0]['Close']
+stock_init_share = stock_share
 # 债券金额
 bond_share = invest_money * bond_rate / bond_df.iloc[0]['Close']
-# 空闲金钱
-free_money = 0
+bond_init_share = bond_share
+
+re_balance_invest = []
 
 
 def re_balance_operation(stock_share, stock_close,
@@ -94,29 +97,31 @@ plt.figure(1)
 plt.plot(stock_df.index, stock_df['Close'], color="red", linewidth=1, label='NDX_WEEK')
 
 for index, row in stock_df.iterrows():
+    stock_close = row['Close']
+    bond_close = bond_df.loc[index]['Close']
     if row['operation'] == 'balance':
-        stock_close = row['Close']
-        bond_close = bond_df.loc[index]['Close']
         print(f"日期：{index}，执行rebalance操作")
         stock_share, bond_share = re_balance_operation(stock_share, stock_close, stock_rate, bond_share, bond_close)
         plt.scatter(index, stock_close, marker='*')
     elif row['operation'] == 'buy':
-        # stock_close = row['Close']
-        # bond_close = bond_df.loc[index]['Close']
         print(f"日期：{index}，是买入的时机")
         plt.scatter(index, row['Close'], marker='+')
         # stock_share, bond_share = re_balance_operation(stock_share, stock_close, stock_rate, bond_share, bond_close)
     else:
         pass
+    invest_money = stock_close * stock_share + bond_close * bond_share
+    re_balance_invest.append(invest_money)
 
 # 计算最终收益
 stock_money = stock_share * stock_df.iloc[-1]['Close']
 bond_money = bond_share * bond_df.iloc[-1]['Close']
 all_money = stock_money + bond_money
-annual_return = cal_annual_compound_return(invest_money, all_money, year_interval)
+annual_return = cal_annual_compound_return(init_invest_money, all_money, year_interval)
+re_balance_invest_df = pd.DataFrame(data=re_balance_invest, index=stock_df.index, columns=['money'])
+re_balance_down = np.nanmin(get_drawdown(re_balance_invest_df['money']))
 print(
     f"股票总价为{stock_money:.2f}, 债券总价为{bond_money:.2f}, 总金额为{all_money:.2f}, "
-    f"投资{year_interval:.2f}年，平均年化收益{annual_return:.2%}")
+    f"投资{year_interval:.2f}年，平均年化收益{annual_return:.2%}，最大回撤{re_balance_down:.2%}")
 
 
 # plt.plot(bond_df.index, bond_df['Close'], color="blue", linewidth=1, label='TLT_WEEK')
@@ -146,3 +151,9 @@ plt.ylabel('MA')
 plt.show()
 
 
+all_money_2 = stock_init_share * stock_df.iloc[-1]['Close'] + bond_init_share * bond_df.iloc[-1]['Close']
+stable_invest_money = stock_init_share * stock_df['Close'] + bond_init_share * bond_df['Close']
+annual_return = cal_annual_compound_return(init_invest_money, all_money_2, year_interval)
+stable_invest_money = pd.DataFrame(data=stable_invest_money.array, index=stock_df.index, columns=['money'])
+stable_down = np.nanmin(get_drawdown(stable_invest_money['money']))
+print(f"梭哈的年化收益率为{annual_return:.2%}，最大回撤{stable_down:.2%}")
