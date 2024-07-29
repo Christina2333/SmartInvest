@@ -8,6 +8,10 @@ from my.stgy.CalendarStgy import calendar_stgy
 from my.stgy.RotationStgy import rotation_stgy, rotation_stgy1
 from my.stgy.SimpleRateStgy import simple_rate_stgy
 
+"""
+对 A 股的一些策略回测
+"""
+
 if __name__ == '__main__':
     # 设置回测参数
     start_date = datetime.date(2020, 7, 31)  # 回测起始日期

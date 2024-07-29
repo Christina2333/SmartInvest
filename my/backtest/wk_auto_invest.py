@@ -12,6 +12,10 @@ from my.BaseUtils import get_all_weekdays
 from my.BaseUtils import get_all_monthdays
 from my.BaseUtils import get_drawdown
 
+"""
+周定投
+"""
+
 # 初始数据
 # 回测数据及范围
 # fund = FundType.GEI

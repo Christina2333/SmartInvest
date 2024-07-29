@@ -11,6 +11,10 @@ from my.BaseUtils import get_all_monthdays
 from my.BaseUtils import get_drawdown
 from datetime import datetime
 
+"""
+每月第一个交易日定投，计算 NDX 和 SPY 的收益率和最大回撤对比
+"""
+
 # 2000年互联网泡沫
 # start_date = '2000-03-10'
 start_date = '1999-07-05'

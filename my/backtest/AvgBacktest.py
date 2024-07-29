@@ -6,6 +6,11 @@ from my.BaseUtils import cal_period_perf_indicator
 from my.DataProcess import get_hist_data
 from my.stgy.avg_9 import avg_9_stgy
 
+"""
+对 A 股的一些策略回测
+"""
+
+
 if __name__ == '__main__':
     fund_type = FundType.GEI
 

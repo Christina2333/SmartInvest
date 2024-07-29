@@ -8,6 +8,10 @@ from my.DataProcess import get_hist_data
 from my.BaseUtils import cal_annual_compound_return, datestr2dtdate
 from my.BaseUtils import get_drawdown
 
+"""
+选择 周 K 的 24均线和 48均线，两个均线相交时为买入或卖出点，当 24均线下穿 48均线时卖出，24均线上穿 48均线时买入，计算 NDX 的收益和回撤
+"""
+
 # 初始数据
 # 回测数据及范围
 stock_fund = FundType.NDX

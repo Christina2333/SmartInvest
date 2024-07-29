@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 from my.Base import FundType
 from my.DataProcess import get_hist_data
 
+"""
+NDX 和 SPY 的历史数据绘制
+"""
+
+
 close = 'Adj Close'
 df_ndx = get_hist_data(FundType.NDX, index_ids=[close], start_date=None, end_date=None,
                        replace={"Adj Close": "Close", "收盘": "Close"})

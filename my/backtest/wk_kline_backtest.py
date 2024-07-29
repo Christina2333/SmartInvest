@@ -10,6 +10,11 @@ from my.DataProcess import get_hist_data
 from my.BaseUtils import cal_annual_compound_return, datestr2dtdate
 from my.BaseUtils import get_drawdown
 
+"""
+债券和 NDX 的投资组合，计算 NDX 周 K 的 24和 48均线，两均线相交处进行 rebalance
+"""
+
+
 # 初始数据
 # 回测数据及范围
 stock_fund = FundType.NDX
