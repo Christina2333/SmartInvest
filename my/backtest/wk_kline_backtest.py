@@ -5,12 +5,9 @@ import matplotlib.pyplot as plt
 from my.Base import FundType
 from my.Base import FreqType
 from my.Base import AutoInvestPlan
-from my.Base import WeekDay
 from my.Base import MonthInvest
 from my.DataProcess import get_hist_data
 from my.BaseUtils import cal_annual_compound_return, datestr2dtdate
-from my.BaseUtils import get_all_weekdays
-from my.BaseUtils import get_all_monthdays
 from my.BaseUtils import get_drawdown
 
 # 初始数据

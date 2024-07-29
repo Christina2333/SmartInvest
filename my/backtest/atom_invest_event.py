@@ -12,14 +12,15 @@ from my.BaseUtils import get_drawdown
 from datetime import datetime
 
 # 2000年互联网泡沫
-start_date = '2000-03-10'
+# start_date = '2000-03-10'
+start_date = '1999-07-05'
 # 2007次贷危机
 # start_date = '2007-10-31'
 # 2020年疫情
 # start_date = '2020-02-01'
 # 2021底
 # start_date = '2022-01-01'
-end_date = '2024-05-10'
+end_date = '2024-07-05'
 # 时间差
 year_interval = (datetime.strptime(end_date, '%Y-%m-%d') - datetime.strptime(start_date, '%Y-%m-%d')).days / 365.0
 close = 'Adj Close'
@@ -79,6 +80,7 @@ print(
     f"NDX 近{year_interval}年的年均复合收益为: {cal_annual_compound_return(df_ndx.iloc[1]['Close'], df_ndx.iloc[-1]['Close'], year_interval):.4%}")
 print(f"NDX 定投 年复合收益：{cal_annual_compound_return(total_investment_ndx, final_value_ndx, year_interval):.4%}")
 print(f"NDX 最大回撤为{np.nanmin(get_drawdown(df_ndx['Close'])):.4%}")
+print(f"NDX定投 最大回撤为{min(ndx_margin):.4%}")
 
 print(f"SPY 近{year_interval}年的总收益为: {df_spy.iloc[-1]['Close'] / df_spy.iloc[1]['Close']:.4%}")
 print(f"SPY 定投收益率: {final_value_spy / total_investment_spy:.4%}")
@@ -86,6 +88,7 @@ print(
     f"SPY 近{year_interval}年的年均复合收益为: {cal_annual_compound_return(df_spy.iloc[1]['Close'], df_spy.iloc[-1]['Close'], year_interval):.4%}")
 print(f"SPY 定投 年复合收益：{cal_annual_compound_return(total_investment_spy, final_value_spy, year_interval):.4%}")
 print(f"SPY 最大回撤为{np.nanmin(get_drawdown(df_spy['Close'])):.4%}")
+print(f"SPY定投 最大回撤为{min(spy_margin):.4%}")
 
 # 画图
 plt.figure(2)
