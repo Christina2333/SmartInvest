@@ -45,17 +45,10 @@ df_spy_diff = pd.DataFrame({'SPY_PCT': aligned_spy['pct_change'], '513500_PCT': 
 
 
 def is_abnormal(spy_pct, cn_spy_pct):
-    # return (np.sign(spy_pct) != np.sign(cn_spy_pct)) or (abs(spy_pct - cn_spy_pct) > 0.02)
     if spy_pct > 0 > cn_spy_pct:
         if abs(spy_pct - cn_spy_pct) > 1:
             return True
     return False
-
-
-def check_abnormal(series):
-    sign_spy = np.sign(series['SPY_PCT'])
-    sign_cn_spy = np.sign(series['513500_PCT'])
-    return (sign_spy * sign_cn_spy < 0).sum() >= 3
 
 df_spy_diff['abnormal'] = df_spy_diff.apply(
     lambda row: is_abnormal(row['SPY_PCT'], row['513500_PCT']), axis=1
