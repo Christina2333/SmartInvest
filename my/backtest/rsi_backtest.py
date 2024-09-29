@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from my.Base import FundType, FreqType
-from my.DataProcess import get_hist_data
+from my.Base import FundType
+from my.DataProcess import get_hist_data_from_ywcq
 
 """
 根据 rsi 指标，大于 60时卖出，小于 20时买入进行回测
@@ -13,6 +13,25 @@ fund = FundType.NDX
 start_date = '2004-09-13'
 end_date = '2024-09-13'
 
+"""
+带权重的移动平均
+Y=(X * M + Y' * (N - M)) / N
+"""
+def weighed_sma(df, n, m, column_name = 'Close'):
+    sma_values = []
+
+    prices = df[column_name].values
+
+    for i in range(len(prices)):
+        if i < n:
+            sma_values.append(prices[i])
+        else:
+            previous_sma = sma_values[-1]
+            current_price = prices[i]
+            sma_values.append((current_price * m + previous_sma * (n - m)) / n)
+
+    return pd.DataFrame(index=df.index, columns=[column_name], data=sma_values)
+
 
 def calculate_rsi(data, period=20):
     # 计算差分
@@ -20,17 +39,16 @@ def calculate_rsi(data, period=20):
 
     # 分离出上涨的下跌
     gain = delta.where(delta > 0, 0)
-    loss = -delta.where(delta < 0, 0)
+    # loss = -delta.where(delta < 0, 0)
+    gain_and_loss = abs(delta)
 
     # 计算平均收益和平均损失
-    avg_gain = gain.rolling(window=period).mean()
-    avg_loss = loss.rolling(window=period).mean()
+    # avg_gain = gain.rolling(window=period).mean()
+    avg_gain = weighed_sma(gain, period, 1)
+    # avg_loss = loss.rolling(window=period).mean()
+    avg_gain_and_loss = weighed_sma(gain_and_loss, period, 1)
 
-    # 计算 rs
-    rs = avg_gain / avg_loss
-
-    # 计算 rsi
-    rsi = 100 - (100 / (1 + rs))
+    rsi = (avg_gain / avg_gain_and_loss) * 100
 
     return rsi
 
@@ -50,8 +68,13 @@ def process_series(arr):
             result[idx] = True
     return result
 
-df = get_hist_data(fund, index_ids=['Adj Close'], start_date=start_date, end_date=end_date,
-                   replace={"Adj Close": "Close", "收盘": "Close"}, freq=FreqType.Week)
+# df = get_hist_data(fund, index_ids=['Adj Close'], start_date=start_date, end_date=end_date,
+#                    replace={"Adj Close": "Close", "收盘": "Close"}, freq=FreqType.Week)
+df = get_hist_data_from_ywcq("../data/usa/纳斯达克100指数历史数据_wk.csv",
+                             index_ids=['收盘'],
+                             start_date=start_date, end_date=end_date,
+                             replace={"收盘": "Close"})
+
 
 BUY_RSI = 30
 SELL_RSI = 80
