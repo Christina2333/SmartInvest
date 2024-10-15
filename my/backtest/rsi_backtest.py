@@ -4,6 +4,7 @@ import pandas as pd
 
 from my.Base import FundType
 from my.DataProcess import get_hist_data_from_ywcq
+from my.utils.index_utils import weighed_sma
 
 """
 根据 rsi 指标，大于 60时卖出，小于 20时买入进行回测
@@ -12,25 +13,6 @@ from my.DataProcess import get_hist_data_from_ywcq
 fund = FundType.NDX
 start_date = '2004-09-13'
 end_date = '2024-09-13'
-
-"""
-带权重的移动平均
-Y=(X * M + Y' * (N - M)) / N
-"""
-def weighed_sma(df, n, m, column_name = 'Close'):
-    sma_values = []
-
-    prices = df[column_name].values
-
-    for i in range(len(prices)):
-        if i < n:
-            sma_values.append(prices[i])
-        else:
-            previous_sma = sma_values[-1]
-            current_price = prices[i]
-            sma_values.append((current_price * m + previous_sma * (n - m)) / n)
-
-    return pd.DataFrame(index=df.index, columns=[column_name], data=sma_values)
 
 
 def calculate_rsi(data, period=20):

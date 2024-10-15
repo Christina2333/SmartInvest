@@ -77,7 +77,10 @@ def get_hist_data_from_ywcq(file_name, index_ids=None, start_date=None, end_date
     data = pd.read_csv(file_name)
     if not data['收盘'].dtype.name == 'float64':
         data['收盘'] = data['收盘'].str.replace(',', '')
+    if not data['交易量'].dtype.name == 'float64':
+        data['交易量'] = data['交易量'].str.replace(',', '')
     data['收盘'] = pd.to_numeric(data['收盘'])
+    data['交易量'] = data['交易量'].apply(parse_vol)
     data = data.set_index('日期')
     data = data.iloc[::-1]
     data.index = [datestr2dtdate(e) for e in data.index]
@@ -96,6 +99,18 @@ def get_hist_data_from_ywcq(file_name, index_ids=None, start_date=None, end_date
                 data = data.rename(columns={old_key: new_key})
     return data
 
+
+def parse_vol(vol):
+    """
+    把字符串交易量转为数字
+    其中M为 million，即 1,000,000，B为 billion，即 1,000,000,000
+    """
+    if vol.endswith('M'):
+        return float(vol[:-1]) * 1_000_000
+    elif vol.endswith('B'):
+        return float(vol[:-1]) * 1_000_000_000
+    else:
+        return float(vol)
 
 def get_trading_dates(fund_type: FundType, start_date=None, end_date=None):
     """

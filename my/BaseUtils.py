@@ -45,7 +45,7 @@ def cal_period_perf_indicator(adjnav):
     # 每天的波动
     ret = adjnav.pct_change()
     # 年化收益率
-    annret = (adjnav[-1] / 1) ** (242 / len(adjnav)) - 1  # 复利
+    annret = (adjnav.iloc[-1] / 1) ** (242 / len(adjnav)) - 1  # 复利
     # 年化波动率
     annvol = np.nanstd(ret) * np.sqrt(242)  # 波动的标准差 * 根号(242)，假设一年有242的交易日
     # 年化收益/年化波动
